@@ -8,11 +8,19 @@ Give it a Spaces link (or the tweet that posted the replay). Get a timed transcr
 
 Whisper is the ear. Hydra is the speaker list.
 
+## Demo
+
+The Space [@elonmusk posted](https://x.com/elonmusk/status/1661498079386931206) on 24 May 2023 — DeSantis announcement, servers straining, ~667,000 trying to get in.
+
+https://x.com/i/spaces/1eaJbrAlZjjJX
+
+Play the tape on the **Space Tape** site (this git as a page). Cues live in [`examples/1eaJbrAlZjjJX`](examples/1eaJbrAlZjjJX). Original replay expired — that's why you download.
+
 <!-- PLAYER -->
 
 ```bash
 pip install git+https://github.com/hovtgc/x-spaces-transcription.git
-space-tape transcribe "https://x.com/i/spaces/1pKdRDlVbRrJW"
+space-tape transcribe "https://x.com/elonmusk/status/1661498079386931206"
 ```
 
 Package name: `space-tape`. You get `cues.json`, `transcript.md`, and `audio.mp3`. No browser. No X API key. No virtual computer.
