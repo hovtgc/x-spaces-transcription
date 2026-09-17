@@ -4,8 +4,8 @@ The Space [Elon posted](https://x.com/elonmusk/status/1661498079386931206) on 24
 
 https://x.com/i/spaces/1eaJbrAlZjjJX
 
-Host `@elonmusk`. On stage: `@DavidSacks`, `@GovRonDeSantis`. Peak about 667,000 trying to get in. The first room melted. They restarted on Sacks' account. DeSantis did not speak in Elon's room.
+Host of this tape: `@DavidSacks` (they moved rooms after Elon's melted). On stage: `@elonmusk`, `@GovRonDeSantis`.
 
-The original replay expired. This `cues.json` is a reconstruction from contemporaneous public quotes (NYT, Variety, Guardian, Rolling Stone, Miami New Times). It is not a Whisper run on the lost m4a.
+This `cues.json` is timed to the **real replay** — their voices. The player clip is the opening of that file (dead air, then “that was insane, sorry,” then the announcement). Speakers labeled from the room; Hydra was stripped when the demo was remuxed to mp3. Parse the raw mpegts if you want the tags.
 
-Keep the original X link. Playback is a convenience. X is the source.
+Keep the original X link. X is the source.

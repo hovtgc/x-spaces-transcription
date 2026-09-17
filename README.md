@@ -14,7 +14,7 @@ The Space [@elonmusk posted](https://x.com/elonmusk/status/1661498079386931206) 
 
 https://x.com/i/spaces/1eaJbrAlZjjJX
 
-Play the tape on the **Space Tape** site (this git as a page). Cues live in [`examples/1eaJbrAlZjjJX`](examples/1eaJbrAlZjjJX). Original replay expired — that's why you download.
+Play the tape on the **Space Tape** site (this git as a page). Cues live in [`examples/1eaJbrAlZjjJX`](examples/1eaJbrAlZjjJX). Audio is the **real replay**. Hydra lives in the raw mpegts — remux strips it.
 
 <!-- PLAYER -->
 
