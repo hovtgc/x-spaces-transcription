@@ -1,0 +1,21 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run tests (no torch)
+        run: |
+          python tests/test_hydra.py
+          python tests/test_merge.py
+          python tests/test_urls.py
+          python tests/test_render.py

@@ -1,0 +1,170 @@
+# space-tape
+
+Open-source **X Spaces transcription**.
+
+> The page is the git.
+
+Give it a Spaces link (or the tweet that posted the replay). Get a timed transcript with speakers, plus the audio file. Keep the original X link next to the result.
+
+Whisper is the ear. Hydra is the speaker list.
+
+<!-- PLAYER -->
+
+```bash
+pip install git+https://github.com/hovtgc/x-spaces-transcription.git
+space-tape transcribe "https://x.com/i/spaces/1pKdRDlVbRrJW"
+```
+
+Package name: `space-tape`. You get `cues.json`, `transcript.md`, and `audio.mp3`. No browser. No X API key. No virtual computer.
+
+Repo: [hovtgc/x-spaces-transcription](https://github.com/hovtgc/x-spaces-transcription)
+
+---
+
+## Do you need a virtual computer?
+
+**No — not for recorded Spaces.**
+
+A replay is just a file. Three things come out of it:
+
+| Signal | Where it lives | Tool |
+| --- | --- | --- |
+| Words | mixed audio | [Hugging Face Whisper](https://huggingface.co/openai/whisper-large-v3) (`transformers` ASR pipeline) |
+| Who is unmuted | ID3 tags muxed into the HLS/m4a (`HydraParticipants`, `HydraAudioLevel`, NTP) | [`space_tape/hydra.py`](/blob/space_tape/hydra.py) |
+| Identity (handle, pfp, X user id) | those same Hydra tags | no API call required |
+
+A browser agent watching the unmute UI is a **fallback**, not the pipeline.
+
+If you have the replay **as downloaded** (`.m4a` / `.ts` from yt-dlp), skip the computer. An agent only needs a **shell** (`yt-dlp`, `ffmpeg`, Python).
+
+---
+
+## Pipeline
+
+```
+Spaces or tweet URL
+        │
+        ▼
+ yt-dlp ──► replay.m4a / replay.ts   (keep ID3)
+        │
+        ├─────────────────────────────┐
+        ▼                             ▼
+ parse Hydra ID3              ffmpeg → 16 kHz mono wav
+ (who's unmuted, ~1 Hz)               │
+        │                             ▼
+        │                     Hugging Face Whisper
+        │                     (segments + optional words)
+        ▼                             ▼
+        └──────────── merge ──────────┘
+                      │
+                      ▼
+         cues.json + transcript.md + audio.mp3
+         (and the original X URL, untouched)
+```
+
+See [AGENTS.md](/blob/AGENTS.md) for the agent playbook.
+
+---
+
+## Quick start
+
+Accept any of:
+
+```
+https://x.com/i/spaces/1pKdRDlVbRrJW
+https://x.com/notpierce69/status/2100117423017906497
+https://twitter.com/i/spaces/...
+```
+
+```bash
+# KEEP the mpegts/m4a. Do not remux yet — remux strips Hydra tags.
+space-tape transcribe "https://x.com/i/spaces/1pKdRDlVbRrJW" -o ./out
+space-tape transcribe "https://x.com/user/status/123" --model openai/whisper-small.en
+```
+
+Python:
+
+```python
+from space_tape.download import download, parse_url
+from space_tape.hydra import hydra_series, regions
+from space_tape.merge import attach_speakers
+from space_tape.transcribe import transcribe
+from space_tape.render import wav_for_asr, write_outputs
+```
+
+System: `ffmpeg`. Whisper weights: Apache 2.0.
+
+English Spaces: `openai/whisper-small.en` or `medium.en`. Mixed language: `openai/whisper-large-v3`.
+
+---
+
+## Hydra
+
+X's audio stack is called **Hydra**. About once a second it writes ID3v2 frames into the stream:
+
+| Frame | Description |
+| --- | --- |
+| `TXXX JSONMetadata` | `{ "HydraVersion": 4, "ntp": … }` — clock |
+| `TXXX HydraParticipants` | JSON array of people **on stage** (not listeners) |
+| `TXXX HydraAudioLevel` | JSON int array, one level per on-stage slot |
+
+**Index mapping that worked in practice:**
+
+- `HydraAudioLevel[0]` = host
+- `HydraAudioLevel[i+1]` = `HydraParticipants[i]`
+- level `0` = muted / silence
+- level `≳ 8` = unmuted and making sound
+
+NTP is seconds. Subtract the first NTP to get media time `t`.
+
+**Critical: parse the raw yt-dlp file.** `ffmpeg -c copy` to `.aac` or transcoding to wav **drops every Hydra tag**. Parse first, then convert a copy for Whisper.
+
+Host is not in `HydraParticipants`. Bake the host handle from the tweet author or `--host`.
+
+Drop a raw replay on the [player](/player) to parse Hydra in the browser. Nothing is uploaded.
+
+---
+
+## Output
+
+`cues.json` — this is the product.
+
+```json
+[
+  {
+    "start": 5.004,
+    "end": 7.003,
+    "speaker": "notpierce69",
+    "text": "Hey DJ, I don't think anyone else is gonna show up."
+  }
+]
+```
+
+`transcript.md` keeps the X URL. Playback on a site is a convenience. X is the source.
+
+Suggested player: one `<audio>` + the cue list. Highlight the cue whose `[start, end]` contains `audio.currentTime`.
+
+---
+
+## Gotchas (paid for in blood)
+
+- **Never transcode before parsing ID3.** The `.aac`/`.wav` will transcribe and have zero speakers.
+- Hydra ticks ~1 Hz, Whisper segments are 2–8 s. Midpoint assignment is right 95%+ of the time. Don't overfit.
+- Host is slot 0 of `HydraAudioLevel`.
+- `HydraParticipants` is **on-stage only**. Listeners never appear.
+- Empty `[]` participants + `[0]` levels = nobody talking, or host muted.
+- yt-dlp + X will break. Pin yt-dlp, document the last working version.
+- Replays expire. Download is the archive.
+- Whisper hallucinates on long silence. Skip Hydra-silence regions if you need to.
+- Display names change. Bake the handle.
+
+---
+
+## Ethics / ToS
+
+- Public recorded Spaces only.
+- Keep the link to X. You are making a transcript, not a mirror.
+- Don't ship other people's Spaces as if you hosted them.
+- Whisper weights: Apache 2.0 (openai/whisper). Hydra tags are in a file the user already received from X.
+
+MIT. Use it, fork it, host the git as a page.

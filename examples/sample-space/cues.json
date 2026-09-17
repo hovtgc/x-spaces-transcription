@@ -1,0 +1,86 @@
+[
+  {
+    "start": 0.8,
+    "end": 4.99,
+    "speaker": "tape_op",
+    "text": "This is what a Space looks like after space-tape runs."
+  },
+  {
+    "start": 5.1,
+    "end": 13.08,
+    "speaker": "tape_op",
+    "text": "A replay is just a file. You do not need a browser, and you do not need an X API key."
+  },
+  {
+    "start": 13.08,
+    "end": 21.52,
+    "speaker": "second_mic",
+    "text": "Whisper heard the words. Hydra tagged who was unmuted. About once a second, X writes that into the audio as ID3."
+  },
+  {
+    "start": 21.52,
+    "end": 29.66,
+    "speaker": "tape_op",
+    "text": "HydraAudioLevel slot zero is the host. Everyone else on stage sits in HydraParticipants."
+  },
+  {
+    "start": 29.66,
+    "end": 37.99,
+    "speaker": "second_mic",
+    "text": "If you remux to wav before you parse, those tags are gone. The transcript still has words. It has no speakers."
+  },
+  {
+    "start": 37.99,
+    "end": 49.03,
+    "speaker": "tape_op",
+    "text": "So the pipeline is: yt-dlp, keep the mpegts, parse Hydra, then convert a copy for Whisper."
+  },
+  {
+    "start": 49.03,
+    "end": 57.1,
+    "speaker": "second_mic",
+    "text": "Each Whisper cue gets the Hydra region covering its midpoint. That is the whole diarizer. We are not guessing voices."
+  },
+  {
+    "start": 57.1,
+    "end": 66.93,
+    "speaker": "tape_op",
+    "text": "Overlaps stay labeled as both. The mix is one channel. Do not pretend Whisper can split two people talking at once."
+  },
+  {
+    "start": 66.93,
+    "end": 77.26,
+    "speaker": "second_mic",
+    "text": "The product is cues.json. Start, end, speaker, text. Plus transcript.md and a small mp3 for a player."
+  },
+  {
+    "start": 77.26,
+    "end": 85.51,
+    "speaker": "tape_op",
+    "text": "Always keep the original X URL. Playback on a site is a convenience. X is the source."
+  },
+  {
+    "start": 85.51,
+    "end": 94.0,
+    "speaker": "second_mic",
+    "text": "Public recorded Spaces only. Replays expire, so the download is the archive. Listeners never appear in the tags."
+  },
+  {
+    "start": 94.0,
+    "end": 105.63,
+    "speaker": "tape_op",
+    "text": "If yt-dlp finds no media, stop. The Space was not recorded, or the replay is gone. This tool does not join live."
+  },
+  {
+    "start": 105.63,
+    "end": 114.05,
+    "speaker": "second_mic",
+    "text": "Drop a raw replay on the player page to parse Hydra in the browser. Nothing is uploaded. The file already had the speaker list."
+  },
+  {
+    "start": 114.05,
+    "end": 120.81,
+    "speaker": "tape_op",
+    "text": "That is space-tape. Fork it. Run it on a shell. Host the git as a page."
+  }
+]
