@@ -30,7 +30,7 @@ A replay is just a file. Three things come out of it:
 | Signal | Where it lives | Tool |
 | --- | --- | --- |
 | Words | mixed audio | [Hugging Face Whisper](https://huggingface.co/openai/whisper-large-v3) (`transformers` ASR pipeline) |
-| Who is unmuted | ID3 tags muxed into the HLS/m4a (`HydraParticipants`, `HydraAudioLevel`, NTP) | [`space_tape/hydra.py`](/blob/space_tape/hydra.py) |
+| Who is unmuted | ID3 tags muxed into the HLS/m4a (`HydraParticipants`, `HydraAudioLevel`, NTP) | [`space_tape/hydra.py`](space_tape/hydra.py) |
 | Identity (handle, pfp, X user id) | those same Hydra tags | no API call required |
 
 A browser agent watching the unmute UI is a **fallback**, not the pipeline.
@@ -62,7 +62,7 @@ Spaces or tweet URL
          (and the original X URL, untouched)
 ```
 
-See [AGENTS.md](/blob/AGENTS.md) for the agent playbook.
+See [AGENTS.md](AGENTS.md) for the agent playbook.
 
 ---
 
@@ -121,7 +121,7 @@ NTP is seconds. Subtract the first NTP to get media time `t`.
 
 Host is not in `HydraParticipants`. Bake the host handle from the tweet author or `--host`.
 
-Drop a raw replay on the [player](/player) to parse Hydra in the browser. Nothing is uploaded.
+Drop a raw replay on the [Player](/player) tab (or `space-tape hydra replay.m4a`). Nothing is uploaded.
 
 ---
 
