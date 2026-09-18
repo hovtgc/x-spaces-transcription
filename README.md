@@ -157,7 +157,7 @@ Suggested player: one `<audio>` + the cue list. Highlight the cue whose `[start,
 ## Gotchas (paid for in blood)
 
 - **Never transcode before parsing ID3.** The `.aac`/`.wav` will transcribe and have zero speakers.
-- Hydra ticks ~1 Hz, Whisper segments are 2–8 s. Midpoint assignment is right 95%+ of the time. Don't overfit.
+- Hydra ticks ~1 Hz and drops a talker to level 0 between words. Assign each cue to the speaker live for most of it, not the one at its midpoint: midpoints land in those 1 s gaps.
 - Host is slot 0 of `HydraAudioLevel`.
 - `HydraParticipants` is **on-stage only**. Listeners never appear.
 - Empty `[]` participants + `[0]` levels = nobody talking, or host muted.
