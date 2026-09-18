@@ -83,6 +83,15 @@ def download(url: str, out_dir: str | Path) -> Path:
         "-f",
         "bestaudio/best",
         "--hls-use-mpegts",
+        # ffmpeg's HLS demuxer and yt-dlp's FixupM3u8 remux both drop the
+        # ID3 frames. Native fragments + no fixup keeps Hydra intact.
+        "--downloader",
+        "m3u8:native",
+        "--fixup",
+        "never",
+        # With --no-part a re-run into the same dir otherwise appends a second
+        # full copy onto the existing replay (and Hydra's clock resets mid-file).
+        "--force-overwrites",
         "--no-part",
         "-o",
         pattern,

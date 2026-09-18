@@ -19,6 +19,7 @@ space-tape is a recorded-Space pipeline. Whisper is the ear. Hydra is the speake
 ## Tests
 
 ```bash
+python tests/test_download.py
 python tests/test_hydra.py
 python tests/test_merge.py
 python tests/test_urls.py

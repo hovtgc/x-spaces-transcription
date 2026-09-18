@@ -125,7 +125,7 @@ X's audio stack is called **Hydra**. About once a second it writes ID3v2 frames 
 
 NTP is seconds. Subtract the first NTP to get media time `t`.
 
-**Critical: parse the raw yt-dlp file.** `ffmpeg -c copy` to `.aac` or transcoding to wav **drops every Hydra tag**. Parse first, then convert a copy for Whisper.
+**Critical: parse the raw yt-dlp file.** `ffmpeg -c copy` to `.aac` or transcoding to wav **drops every Hydra tag**. So do yt-dlp's default ffmpeg HLS downloader and its FixupM3u8 remux: download with `--downloader m3u8:native --fixup never`. Parse first, then convert a copy for Whisper.
 
 Host is not in `HydraParticipants`. Bake the host handle from the tweet author or `--host`.
 

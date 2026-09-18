@@ -3,7 +3,7 @@
 Any agent with a shell. Do not watch the Space in a browser to listen and type.
 
 1. Take a URL. Accept `x.com/i/spaces/<id>`, `x.com/<user>/status/<id>`, or `twitter.com` equivalents.
-2. `yt-dlp -f "bestaudio/best" --hls-use-mpegts -o replay.%(ext)s "$URL"`. **Do not remux.** If yt-dlp finds no media, stop — the Space was not recorded or the replay expired.
+2. `yt-dlp -f "bestaudio/best" --hls-use-mpegts --downloader m3u8:native --fixup never -o replay.%(ext)s "$URL"`. **Do not remux.** yt-dlp's default ffmpeg HLS downloader and its FixupM3u8 step both drop the ID3 frames. If yt-dlp finds no media, stop — the Space was not recorded or the replay expired.
 3. Parse Hydra ID3 from the **raw** download (`space_tape/hydra.py`). This is who was unmuted, ~1 Hz, with handles.
 4. Convert a **copy** for ASR: `ffmpeg -i replay.m4a -ac 1 -ar 16000 space.wav`.
 5. Run Hugging Face Whisper with `return_timestamps=True` (word-level if you want karaoke).
