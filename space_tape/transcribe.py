@@ -13,6 +13,19 @@ from pathlib import Path
 
 DEFAULT_MODEL = "openai/whisper-small.en"
 
+# Whisper's own sequential long-form decoding (paper §3.8) with its no-speech
+# guard (no_speech_threshold + logprob_threshold). The pipeline's
+# chunk_length_s mode ignores these and loops on dead air ("Thank you." x23,
+# "it, it, it, ...").
+LONGFORM_GENERATE = {
+    "condition_on_prev_tokens": False,
+    "no_speech_threshold": 0.6,
+    "logprob_threshold": -1.0,
+    # Greedy only. The temperature fallback samples, and sampling crashes in
+    # transformers 5.17 ('EncoderDecoderCache' object has no attribute 'layers').
+    "temperature": 0.0,
+}
+
 
 def transcribe(
     wav: str | Path,
@@ -24,10 +37,17 @@ def transcribe(
 ) -> list[dict]:
     """Return [{start, end, text}] (and optional `words`)."""
     asr = _pipeline(model=model, word_timestamps=word_timestamps, device=device)
-    kwargs: dict = {}
+    kwargs: dict = {"generate_kwargs": dict(LONGFORM_GENERATE)}
     if word_timestamps:
         kwargs["return_timestamps"] = "word"
-    out = asr(str(wav), **kwargs)
+    try:
+        out = asr(str(wav), **kwargs)
+    except ValueError as exc:
+        # transformers 5.17 torch.cat()s an empty list when the no-speech guard
+        # skips every segment of a silent chunk and word timestamps are on.
+        if word_timestamps and "non-empty list of Tensors" in str(exc):
+            return []
+        raise
     return normalize_asr(out, chunk_offset=chunk_offset)
 
 
@@ -94,7 +114,6 @@ def _pipeline(*, model: str, word_timestamps: bool, device: str | None):
     return pipeline(
         "automatic-speech-recognition",
         model=model,
-        chunk_length_s=30,
         return_timestamps=ts,
         device=resolved_device,
     )
@@ -106,6 +125,8 @@ def _default_device() -> str | int:
 
         if torch.cuda.is_available():
             return 0
+        if torch.backends.mps.is_available():
+            return "mps"
     except Exception:
         pass
     return "cpu"

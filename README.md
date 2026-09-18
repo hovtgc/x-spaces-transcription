@@ -163,7 +163,7 @@ Suggested player: one `<audio>` + the cue list. Highlight the cue whose `[start,
 - Empty `[]` participants + `[0]` levels = nobody talking, or host muted.
 - yt-dlp + X will break. Pin yt-dlp, document the last working version.
 - Replays expire. Download is the archive.
-- Whisper hallucinates on long silence. Skip Hydra-silence regions if you need to.
+- Whisper hallucinates on long silence (`Thank you.` x23). Use its sequential long-form decoding with the no-speech guard, not the pipeline's `chunk_length_s`.
 - Display names change. Bake the handle.
 
 ---

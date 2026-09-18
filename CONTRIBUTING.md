@@ -24,6 +24,7 @@ python tests/test_hydra.py
 python tests/test_merge.py
 python tests/test_urls.py
 python tests/test_render.py
+python tests/test_transcribe.py
 ```
 
 No GPU. No X API key. No network.
