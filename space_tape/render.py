@@ -82,13 +82,22 @@ def transcript_md(
         shown = ", ".join(_at(n) for n in names)
         lines.append(f"- Speakers: {shown}")
     lines.append("")
+    # One paragraph per speaker turn: back-to-back cues from the same speaker
+    # merge, stamped with the turn's first cue. cues.json stays per cue.
+    turns: list[list] = []
     for cue in cues:
         text = (cue.get("text") or "").strip()
         if not text:
             continue
         speaker = _at(cue.get("speaker") or "unknown")
-        stamp = format_ts(float(cue.get("start") or 0))
-        lines.append(f"**[{stamp}] {speaker}** {text}")
+        if turns and turns[-1][0] == speaker:
+            turns[-1][2].append(text)
+        else:
+            turns.append([speaker, float(cue.get("start") or 0), [text]])
+    for speaker, start, texts in turns:
+        # Blank line between turns: markdown otherwise folds them into one paragraph.
+        lines.append(f"**{speaker}** [{format_ts(start)}] {' '.join(texts)}")
+        lines.append("")
     lines.append("")
     return "\n".join(lines)
 
