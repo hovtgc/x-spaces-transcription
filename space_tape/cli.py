@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 from space_tape import __version__
+from space_tape.clip import highlights, load_cues, parse_ts, write_clip
 from space_tape.download import DownloadError, download, parse_url
 from space_tape.hydra import hydra_series, regions
 from space_tape.merge import attach_speakers
@@ -42,13 +43,31 @@ def main(argv: list[str] | None = None) -> int:
     h.add_argument("--host", default=None, help="Host handle replacing the 'host' token")
     h.add_argument("-o", "--out", default=None, help="Write regions JSON here instead of stdout")
 
+    c = sub.add_parser("clip", help="Chop cues.json to a timestamp window")
+    c.add_argument("cues", help="Path to cues.json")
+    c.add_argument("--from", dest="start", required=True, help="Start (18, 00:18, 1:02:03)")
+    c.add_argument("--to", dest="end", required=True, help="End timestamp")
+    c.add_argument("-o", "--out", default="./clip", help="Output directory (default: ./clip)")
+    c.add_argument("--audio", default=None, help="Optional audio file to cut to clip.mp3")
+    c.add_argument("--url", default=None, help="Original X URL, written into clip.md")
+    c.add_argument("--title", default="clip", help="Title written into clip.md")
+
+    hl = sub.add_parser("highlights", help="Pick punchy cues from cues.json")
+    hl.add_argument("cues", help="Path to cues.json")
+    hl.add_argument("-n", "--max", dest="max_n", type=int, default=8, help="How many (default: 8)")
+    hl.add_argument("-o", "--out", default=None, help="Write highlights.json here (default: stdout)")
+
     args = parser.parse_args(argv)
     try:
         if args.cmd == "transcribe":
             return _cmd_transcribe(args)
         if args.cmd == "hydra":
             return _cmd_hydra(args)
-    except (DownloadError, RenderError, RuntimeError) as exc:
+        if args.cmd == "clip":
+            return _cmd_clip(args)
+        if args.cmd == "highlights":
+            return _cmd_highlights(args)
+    except (DownloadError, RenderError, RuntimeError, ValueError) as exc:
         print(f"space-tape: {exc}", file=sys.stderr)
         return 1
     return 2
@@ -111,6 +130,8 @@ def _cmd_transcribe(args: argparse.Namespace) -> int:
     print(f"wrote     {written['transcript']}", file=sys.stderr)
     if "audio" in written:
         print(f"wrote     {written['audio']}", file=sys.stderr)
+    if "highlights" in written:
+        print(f"wrote     {written['highlights']}", file=sys.stderr)
     print(transcript_md(merged[:3], source_url=source_url, title=args.title) if merged else "(no cues)", file=sys.stderr)
     return 0
 
@@ -125,6 +146,36 @@ def _cmd_hydra(args: argparse.Namespace) -> int:
     text = json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
     if args.out:
         Path(args.out).write_text(text, encoding="utf-8")
+    else:
+        sys.stdout.write(text)
+    return 0
+
+
+def _cmd_clip(args: argparse.Namespace) -> int:
+    cues = load_cues(args.cues)
+    start = parse_ts(args.start)
+    end = parse_ts(args.end)
+    written = write_clip(
+        cues,
+        start,
+        end,
+        args.out,
+        source_url=args.url,
+        audio_src=args.audio,
+        title=args.title,
+    )
+    for kind, path in written.items():
+        print(f"wrote     {path}", file=sys.stderr)
+    return 0
+
+
+def _cmd_highlights(args: argparse.Namespace) -> int:
+    cues = load_cues(args.cues)
+    hits = highlights(cues, max_n=args.max_n)
+    text = json.dumps(hits, indent=2, ensure_ascii=False) + "\n"
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote     {args.out}", file=sys.stderr)
     else:
         sys.stdout.write(text)
     return 0

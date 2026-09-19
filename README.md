@@ -14,7 +14,7 @@ The Space [@elonmusk posted](https://x.com/elonmusk/status/1661498079386931206) 
 
 https://x.com/i/spaces/1eaJbrAlZjjJX
 
-Play the tape on the **Space Tape** site (this git as a page). Cues live in [`examples/1eaJbrAlZjjJX`](examples/1eaJbrAlZjjJX). Audio is the **real replay**. Hydra lives in the raw mpegts — remux strips it.
+Play the tape on the **Space Tape** site (this git as a page). Cues live in [`examples/1eaJbrAlZjjJX`](examples/1eaJbrAlZjjJX). Audio is the **real replay**. Click a highlight to play just that chop. Shift-click a range to copy a timestamped quote. Hydra lives in the raw mpegts — remux strips it.
 
 <!-- PLAYER -->
 
@@ -66,7 +66,7 @@ Spaces or tweet URL
         └──────────── merge ──────────┘
                       │
                       ▼
-         cues.json + transcript.md + audio.mp3
+         cues.json + highlights.json + transcript.md + audio.mp3
          (and the original X URL, untouched)
 ```
 
@@ -151,6 +151,15 @@ Drop a raw replay on the [Player](/player) tab (or `space-tape hydra replay.m4a`
 `transcript.md` keeps the X URL. Playback on a site is a convenience. X is the source.
 
 Suggested player: one `<audio>` + the cue list. Highlight the cue whose `[start, end]` contains `audio.currentTime`.
+
+`highlights.json` is the same cues, chopped to the lines people actually clip.
+
+```bash
+space-tape highlights out/cues.json -n 8
+space-tape clip out/cues.json --from 00:18 --to 00:26 --audio out/audio.mp3 -o ./clip
+```
+
+`--from` / `--to` take `18`, `00:18`, or `1:02:03`. You get `clip.json`, `clip.md` (timestamped quote), and `clip.mp3` if you pass `--audio`.
 
 ---
 

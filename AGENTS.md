@@ -8,8 +8,8 @@ Any agent with a shell. Do not watch the Space in a browser to listen and type.
 4. Convert a **copy** for ASR: `ffmpeg -i replay.m4a -ac 1 -ar 16000 space.wav`.
 5. Run Hugging Face Whisper with `return_timestamps=True` (word-level if you want karaoke).
 6. Merge: each Whisper cue gets the Hydra speaker live for the largest share of it (Hydra silence ignored).
-7. Write `cues.json`, `transcript.md`, `audio.mp3`. Always include the original X URL.
-8. Do **not** watch the Space in a browser to "listen and type." Whisper is the ear. Hydra is the speaker list.
+7. Write `cues.json`, `highlights.json`, `transcript.md`, `audio.mp3`. Always include the original X URL.
+8. Chop on demand: `space-tape clip cues.json --from 00:18 --to 00:26`. Do **not** watch the Space in a browser to "listen and type." Whisper is the ear. Hydra is the speaker list.
 
 ```bash
 space-tape transcribe "$URL" -o ./out

@@ -41,6 +41,12 @@ def write_outputs(
         encoding="utf-8",
     )
     written: dict[str, Path] = {"cues": json_path, "transcript": md_path}
+    from space_tape.clip import highlights as _highlights
+
+    hits = _highlights(_public_cues(cues))
+    hl_path = dest / "highlights.json"
+    hl_path.write_text(json.dumps(hits, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    written["highlights"] = hl_path
     if audio_src is not None:
         mp3 = write_mp3(audio_src, dest / "audio.mp3")
         written["audio"] = mp3
